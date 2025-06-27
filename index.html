@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palabras que Danzan</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f2f2f2;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .cuento {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .palabras {
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .palabra {
+      background: #3498db;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: grab;
+      user-select: none;
+    }
+    .drop-zone {
+      display: inline-block;
+      width: 100px;
+      min-height: 20px;
+      margin: 0 5px;
+      padding: 5px;
+      border-bottom: 2px dashed #7f8c8d;
+    }
+    .resultado {
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 15px;
+      margin-top: 15px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background: #2ecc71;
+      color: white;
+      font-weight: bold;
+    }
+    .ayuda {
+      background: #f39c12;
+    }
+  </style>
+</head>
+<body>
+  <h1>✍️ Palabras que Danzan</h1>
+  <div class="cuento">
+    El <span class="drop-zone" data-correct="Inti"></span> se levantó sobre los Andes mientras los Wawa Danza alistaban su <span class="drop-zone" data-correct="atuendo"></span> para danzar.<br><br>
+    La <span class="drop-zone" data-correct="Allpamama"></span> les daba la fuerza, y el sonido del <span class="drop-zone" data-correct="Pinkullu"></span> guiaba sus pasos en el ritual ancestral.
+  </div>
+
+  <div class="palabras">
+    <div class="palabra" draggable="true">Inti</div>
+    <div class="palabra" draggable="true">atuendo</div>
+    <div class="palabra" draggable="true">Allpamama</div>
+    <div class="palabra" draggable="true">Pinkullu</div>
+  </div>
+
+  <button onclick="evaluar()">Evaluar</button>
+  <button class="ayuda" onclick="mostrarTraduccion()">Ver traducción</button>
+  <button onclick="location.reload()">Reiniciar</button>
+
+  <div class="resultado" id="resultado"></div>
+
+  <script>
+    const palabras = document.querySelectorAll('.palabra');
+    const zonas = document.querySelectorAll('.drop-zone');
+    let palabraArrastrada = null;
+
+    palabras.forEach(p => {
+      p.addEventListener('dragstart', () => palabraArrastrada = p);
+    });
+
+    zonas.forEach(z => {
+      z.addEventListener('dragover', e => e.preventDefault());
+      z.addEventListener('drop', () => {
+        if (palabraArrastrada) {
+          z.textContent = palabraArrastrada.textContent;
+          z.setAttribute('data-user', palabraArrastrada.textContent);
+        }
+      });
+    });
+
+    function evaluar() {
+      let correctas = 0;
+      zonas.forEach(z => {
+        if (z.getAttribute('data-user') === z.getAttribute('data-correct')) {
+          correctas++;
+        }
+      });
+      const total = zonas.length;
+      const resultado = document.getElementById('resultado');
+      if (correctas === total) {
+        resultado.textContent = '✅ ¡Muy bien! Completaste correctamente el cuento.';
+      } else {
+        resultado.textContent = `❌ Completaste ${correctas} de ${total}. Revisa tus respuestas.`;
+      }
+    }
+
+    function mostrarTraduccion() {
+      alert(`Traducción de palabras:
+Inti = Sol
+atuendo = traje
+Allpamama = Madre Tierra
+Pinkullu = Flauta ritual`);
+    }
+  </script>
+</body>
+</html>
