@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ruta del Tundunchil - Juego Interactivo</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #9b643b, #f0d9b5);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: #3e2f1c;
+    }
+
+    h1 {
+      margin-top: 1rem;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px #5d3b1a;
+    }
+
+    #map {
+      position: relative;
+      background: url('https://i.imgur.com/8URlTWX.jpg') no-repeat center center;
+      background-size: cover;
+      width: 600px;
+      height: 400px;
+      margin: 2rem 0;
+      border: 4px solid #6e4b20;
+      border-radius: 15px;
+      box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+    }
+
+    .stop {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background-color: #d6a157cc;
+      border: 3px solid #8a6a30;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      color: #4a3112;
+      box-shadow: 1px 1px 4px #cba15e;
+      transition: transform 0.3s ease;
+      user-select: none;
+    }
+
+    .stop:hover:not(.disabled) {
+      transform: scale(1.2);
+      box-shadow: 0 0 15px #cda15f;
+    }
+
+    .disabled {
+      background-color: #a98a6b88;
+      border-color: #5a472f88;
+      color: #7a6a57;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none !important;
+    }
+
+    #toctepamba { top: 70%; left: 12%; }
+    #socartes { top: 45%; left: 50%; }
+    #gungrande { top: 20%; left: 80%; }
+
+    #question-box {
+      background-color: #f5f1e9cc;
+      border: 3px solid #8a6a30;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 600px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.15);
+      user-select: none;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .options li {
+      margin-bottom: 12px;
+    }
+
+    .options button {
+      width: 100%;
+      background-color: #d6a157;
+      border: none;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #4a3112;
+      transition: background-color 0.3s ease;
+    }
+
+    .options button:hover {
+      background-color: #c48e3b;
+      color: #fff;
+    }
+
+    #feedback {
+      margin-top: 15px;
+      font-weight: 600;
+      min-height: 2em;
+    }
+
+    #final-message {
+      background-color: #d6a157cc;
+      border: 3px solid #8a6a30;
+      border-radius: 12px;
+      padding: 25px;
+      margin-top: 30px;
+      max-width: 600px;
+      font-size: 1.3rem;
+      text-align: center;
+      color: #4a3112;
+      box-shadow: 2px 2px 12px rgba(0,0,0,0.2);
+      user-select: none;
+    }
+
+    #baston {
+      font-size: 5rem;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧭 Ruta del Tundunchil</h1>
+  <div id="map">
+    <div class="stop" id="toctepamba" data-stop="0">Toctepamba</div>
+    <div class="stop disabled" id="socartes" data-stop="1">Socartes</div>
+    <div class="stop disabled" id="gungrande" data-stop="2">Gun Grande</div>
+  </div>
+  <div id="question-box" style="display:none;">
+    <h2 id="question-text"></h2>
+    <ul class="options" id="options-list"></ul>
+    <div id="feedback"></div>
+  </div>
+  <div id="final-message" style="display:none;">
+    <p>🎉 ¡Felicitaciones, has recorrido la Ruta del Tundunchil y has recibido el bastón sagrado, símbolo de sabiduría ancestral!</p>
+    <div id="baston">🪓✨</div>
+  </div>
+  <script>
+    const stops = [
+      {
+        question: "¿Cuál es la función principal del Tundunchil en la comunidad?",
+        options: [
+          { text: "Cantar y bailar solo por diversión", correct: false },
+          { text: "Representar y preservar las tradiciones ancestrales", correct: true },
+          { text: "Ser un líder político", correct: false },
+          { text: "Organizar eventos deportivos", correct: false }
+        ],
+        feedback: "El Tundunchil representa y preserva las tradiciones ancestrales."
+      },
+      {
+        question: "¿Qué elemento del vestuario del Wawa Danza simboliza la conexión con la tierra?",
+        options: [
+          { text: "La máscara", correct: false },
+          { text: "Los cascabeles", correct: false },
+          { text: "El atuendo tejido", correct: true },
+          { text: "El bastón sagrado", correct: false }
+        ],
+        feedback: "El atuendo tejido representa la conexión con la tierra."
+      },
+      {
+        question: "¿Qué festividad es la más importante para los Tundunchil?",
+        options: [
+          { text: "Carnaval", correct: false },
+          { text: "Fiesta del Inti Raymi", correct: false },
+          { text: "Vísperas del Tundunchil", correct: true },
+          { text: "Fiesta de San Juan", correct: false }
+        ],
+        feedback: "La fiesta de Vísperas del Tundunchil es la más importante."
+      }
+    ];
+
+    let currentStop = 0;
+
+    const stopsElements = document.querySelectorAll('.stop');
+    const questionBox = document.getElementById('question-box');
+    const questionText = document.getElementById('question-text');
+    const optionsList = document.getElementById('options-list');
+    const feedbackDiv = document.getElementById('feedback');
+    const finalMessage = document.getElementById('final-message');
+
+    function enableStop(index) {
+      stopsElements.forEach((el, i) => {
+        el.classList.toggle('disabled', i > index);
+      });
+    }
+
+    function showQuestion(index) {
+      questionBox.style.display = 'block';
+      finalMessage.style.display = 'none';
+      feedbackDiv.textContent = '';
+      questionText.textContent = stops[index].question;
+      optionsList.innerHTML = '';
+      stops[index].options.forEach((opt, i) => {
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.textContent = opt.text;
+        btn.onclick = () => checkAnswer(i, index);
+        li.appendChild(btn);
+        optionsList.appendChild(li);
+      });
+    }
+
+    function checkAnswer(i, stopIndex) {
+      const option = stops[stopIndex].options[i];
+      if (option.correct) {
+        feedbackDiv.style.color = '#2e7d32';
+        feedbackDiv.textContent = "¡Correcto! Avanza a la siguiente parada.";
+        disableButtons();
+        setTimeout(() => {
+          currentStop++;
+          if (currentStop < stops.length) {
+            enableStop(currentStop);
+            showQuestion(currentStop);
+          } else {
+            questionBox.style.display = 'none';
+            finalMessage.style.display = 'block';
+          }
+        }, 1500);
+      } else {
+        feedbackDiv.style.color = '#c62828';
+        feedbackDiv.textContent = stops[stopIndex].feedback + " Intenta de nuevo.";
+      }
+    }
+
+    function disableButtons() {
+      document.querySelectorAll('.options button').forEach(btn => btn.disabled = true);
+    }
+
+    stopsElements.forEach((el, i) => {
+      el.addEventListener('click', () => {
+        if (!el.classList.contains('disabled')) {
+          showQuestion(i);
+        }
+      });
+    });
+
+    enableStop(0);
+    showQuestion(0);
+  </script>
+</body>
+</html>
